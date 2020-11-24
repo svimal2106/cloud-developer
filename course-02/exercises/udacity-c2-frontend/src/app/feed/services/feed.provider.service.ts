@@ -12,15 +12,17 @@ export class FeedProviderService {
 
   constructor(private api: ApiService) { }
 
+  /*
+  This method gets the feed items from REST API and updates the S3 image url to point to
+  url for image server request
+   */
   async getFeed(): Promise<BehaviorSubject<FeedItem[]>> {
     const req = await this.api.get('/feed');
     const items = <FeedItem[]> req.rows;
-    items.forEach(item => console.log('Item url ' + item.url));
-    const filtered_image_items = items.map(item => {
-      const filtered_item = item;
+    const items_with_updated_url = items.map(item => {
       const regex = /&/gi;
-      filtered_item.url = IMAGE_API_HOST.concat(item.url).replace(regex, '%26');
-      return filtered_item;
+      item.url = IMAGE_API_HOST.concat(item.url).replace(regex, '%26');
+      return item;
     });
     this.currentFeed$.next(items);
     return Promise.resolve(this.currentFeed$);
