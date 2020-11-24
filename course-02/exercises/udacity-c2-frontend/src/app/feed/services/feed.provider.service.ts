@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { FeedItem, feedItemMocks } from '../models/feed-item.model';
 import { BehaviorSubject } from 'rxjs';
 
-import { ApiService } from '../../api/api.service';
+import { ApiService, IMAGE_API_HOST} from '../../api/api.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +15,13 @@ export class FeedProviderService {
   async getFeed(): Promise<BehaviorSubject<FeedItem[]>> {
     const req = await this.api.get('/feed');
     const items = <FeedItem[]> req.rows;
+    items.forEach(item => console.log('Item url ' + item.url));
+    const filtered_image_items = items.map(item => {
+      const filtered_item = item;
+      const regex = /&/gi;
+      filtered_item.url = IMAGE_API_HOST.concat(item.url).replace(regex, '%26');
+      return filtered_item;
+    });
     this.currentFeed$.next(items);
     return Promise.resolve(this.currentFeed$);
   }

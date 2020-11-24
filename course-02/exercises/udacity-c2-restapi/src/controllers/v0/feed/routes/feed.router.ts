@@ -6,7 +6,7 @@ import * as AWS from '../../../../aws';
 const router: Router = Router();
 
 // Get all feed items
-router.get('/', requireAuth, async (req: Request, res: Response) => {
+router.get('/', async (req: Request, res: Response) => {
     const items = await FeedItem.findAndCountAll({order: [['id', 'DESC']]});
     items.rows.map((item) => {
             if (item.url) {
@@ -68,6 +68,7 @@ router.post('/batchdelete', async(req: Request, res: Response) => {
 router.get('/signed-url/:fileName',
     requireAuth,
     async (req: Request, res: Response) => {
+    console.log('Got request to get signed url');
     const { fileName } = req.params;
     const url = AWS.getPutSignedUrl(fileName);
     res.status(201).send({url: url});

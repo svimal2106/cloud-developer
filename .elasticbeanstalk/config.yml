@@ -1,6 +1,22 @@
 branch-defaults:
+  auth:
+    environment: svimal2106-cloud-developer-dev2
   master:
     environment: null
     group_suffix: null
+environment-defaults:
+  svimal2106-cloud-developer-dev2:
+    branch: null
+    repository: null
 global:
+  application_name: svimal2106-cloud-developer
+  default_ec2_keyname: udacity_course
+  default_platform: Node.js 10 running on 64bit Amazon Linux 2
+  default_region: us-east-2
+  include_git_submodules: true
+  instance_profile: null
+  platform_name: null
+  platform_version: null
   profile: null
+  sc: git
+  workspace_type: Application
