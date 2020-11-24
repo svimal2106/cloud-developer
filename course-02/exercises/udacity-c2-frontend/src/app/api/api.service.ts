@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable, Query} from '@angular/core';
 import { HttpClient, HttpHeaders,  HttpErrorResponse, HttpRequest, HttpEvent } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
@@ -6,13 +6,14 @@ import { FeedItem } from '../feed/models/feed-item.model';
 import { catchError, tap, map } from 'rxjs/operators';
 
 const API_HOST = environment.apiHost;
+export const IMAGE_API_HOST = environment.imageApiHost;
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
   httpOptions = {
-    headers: new HttpHeaders({'Content-Type': 'application/json'})
+    headers: new HttpHeaders({'Content-Type': 'application/json'}),
   };
 
   token: string;
@@ -31,6 +32,7 @@ export class ApiService {
 
   get(endpoint): Promise<any> {
     const url = `${API_HOST}${endpoint}`;
+    console.log('Executing API request to url ' + url);
     const req = this.http.get(url, this.httpOptions).pipe(map(this.extractData));
 
     return req
@@ -41,8 +43,20 @@ export class ApiService {
             });
   }
 
+    get_image_service(endpoint): Promise<any> {
+        const url = `${IMAGE_API_HOST}${endpoint}`;
+        const req = this.http.get(url, { responseType: 'blob'});
+        return req
+            .toPromise()
+            .catch((e) => {
+                this.handleError(e);
+                throw e;
+            });
+    }
+
   post(endpoint, data): Promise<any> {
     const url = `${API_HOST}${endpoint}`;
+    console.log('Executing post request to url ' + url);
     return this.http.post<HttpEvent<any>>(url, data, this.httpOptions)
             .toPromise()
             .catch((e) => {
@@ -53,6 +67,7 @@ export class ApiService {
 
   async upload(endpoint: string, file: File, payload: any): Promise<any> {
     const signed_url = (await this.get(`${endpoint}/signed-url/${file.name}`)).url;
+    console.log('Signed url ' + signed_url);
 
     const headers = new HttpHeaders({'Content-Type': file.type});
     const req = new HttpRequest( 'PUT', signed_url, file,
