@@ -2,6 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
 import {requireAuth} from './auth';
+import {Request, Response} from 'express';
 
 (async () => {
 
@@ -33,28 +34,28 @@ import {requireAuth} from './auth';
   
   // Root Endpoint
   // Displays a simple message to the user
-  app.get( "/", async ( req, res ) => {
-    const response_body = JSON.parse('{"message" : "try GET /filteredimage?image_url={{}}"}');
+  app.get( "/", async ( req: Request, res: Response ) => {
+    const response_body: JSON = JSON.parse('{"message" : "try GET /filteredimage?image_url={{}}"}');
     console.log(response_body);
     res.send(response_body)
   });
 
-  app.get("/filteredimage", async(req, res) => {
-    const image_url = req.query['image_url'];
+  app.get("/filteredimage", async(req: Request, res: Response) => {
+    const image_url: string = req.query['image_url'];
     if (image_url == null) {
       res.status(400).send('Please specify image url in query');
     }
     console.log('Got image url ' + image_url);
-    const filtered_image_path = await filterImageFromURL(image_url);
+    const filtered_image_path: string = await filterImageFromURL(image_url);
     console.log('Filtered image saved at location ' + filtered_image_path);
-    res.status(200).sendFile(filtered_image_path, function (err) {
+    res.status(200).sendFile(filtered_image_path, function (err: Error) {
       if (err == undefined) {
         console.log('File sent with response');
       } else {
-        console.log('Error occured while sending response ' + err);
+        console.log('Error occured while sending response ' + err.message);
       }
       console.log('Deleting the filtered image file');
-      let local_files = new Array(filtered_image_path);
+      let local_files: Array<string> = new Array(filtered_image_path);
       deleteLocalFiles(local_files);
     });
   });

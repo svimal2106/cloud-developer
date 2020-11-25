@@ -18,13 +18,13 @@ export class FeedProviderService {
    */
   async getFeed(): Promise<BehaviorSubject<FeedItem[]>> {
     const req = await this.api.get('/feed');
-    const items = <FeedItem[]> req.rows;
-    const items_with_updated_url = items.map(item => {
+    const items: FeedItem[] = <FeedItem[]> req.rows;
+    const items_with_updated_url: FeedItem[] = items.map(item => {
       const regex = /&/gi;
       item.url = IMAGE_API_HOST.concat(item.url).replace(regex, '%26');
       return item;
     });
-    this.currentFeed$.next(items);
+    this.currentFeed$.next(items_with_updated_url);
     return Promise.resolve(this.currentFeed$);
   }
 
